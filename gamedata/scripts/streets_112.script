@@ -1,0 +1,180 @@
+local ll_old = game_achievements.wishful_thinking_rewards
+local ms_old = game_achievements.absolver_rewards
+local oa_old = game_achievements.collaborator_rewards
+
+splits = ini_file_ex("plugins\\speedrunner.ltx", true)
+
+function get_actual_time()
+	local s_time = level.get_start_time() or 0
+	local time = tonumber(game.get_game_time():diffSec(s_time))
+	return math.ceil(time)
+end
+
+
+local clr_r  = utils_xml.get_color("d_red")
+local clr_o  = utils_xml.get_color("d_orange")
+local clr_y  = utils_xml.get_color("yellow")
+local clr_g  = utils_xml.get_color("d_green")
+local clr_p  = utils_xml.get_color("d_purple")
+local clr_w	 = utils_xml.get_color("d_white")
+
+local into_clock = speedrunner.time_split_2
+
+local function show_times()
+	local msg = ""
+	
+	local ll_chk1 = splits:r_value("times", "ll_last", 2)
+	local ll_chk2 = splits:r_value("times", "ll_best", 2)
+	local ms_chk1 = splits:r_value("times", "ms_last", 2)
+	local ms_chk2 = splits:r_value("times", "ms_best", 2)
+	local oa_chk1 = splits:r_value("times", "oa_last", 2)
+	local oa_chk2 = splits:r_value("times", "oa_best", 2)
+	
+	local ll_last = into_clock( splits:r_value("times", "ll_last", 2) )
+	local ll_best = into_clock( splits:r_value("times", "ll_best", 2) )
+	local ms_last = into_clock( splits:r_value("times", "ms_last", 2) )
+	local ms_best = into_clock( splits:r_value("times", "ms_best", 2) )
+	local oa_last = into_clock( splits:r_value("times", "oa_last", 2) )
+	local oa_best = into_clock( splits:r_value("times", "oa_best", 2) )
+	
+	no_time = 1
+	
+	--msg = clr_w .. "LOST TO THE ZONE - Splits:" .. clr_w .. "\\n \\n"
+	if ll_chk1 > 0 then
+		msg = msg .. clr_y .. "Living Legend" .. clr_w .. "\\n \\n"
+		if ll_chk2 > 0 then
+			msg = msg .. clr_g .. "BEST TIME: " .. clr_w .. ll_best .. "\\n"
+		end
+		msg = msg .. clr_o .. "LAST TIME: " .. clr_w .. ll_last .. "\\n \\n"
+		no_time = 0
+	end
+	if ms_chk1 > 0 then
+		msg = msg .. clr_y .. "Mortal Sin" .. clr_w .. "\\n \\n"
+		if ms_chk2 > 0 then
+			msg = msg .. clr_g .. "BEST TIME: " .. clr_w .. ms_best .. "\\n"
+		end
+		msg = msg .. clr_o .. "LAST TIME: " .. clr_w .. ms_last .. "\\n \\n"
+		no_time = 0
+	end
+	if oa_chk1 > 0 then
+		msg = msg .. clr_y .. "Operation Afterglow" .. clr_w .. "\\n \\n"
+		if oa_chk2 > 0 then
+			msg = msg .. clr_g .. "BEST TIME: " .. clr_w .. oa_best .. "\\n"
+		end
+		msg = msg .. clr_o .. "LAST TIME: " .. clr_w .. oa_last .. "\\n \\n"
+		no_time = 0
+	end
+	
+	if no_time == 1 then
+		msg = msg .. clr_r .. "No times registered yet!"
+	end
+	
+	if db.actor then
+        db.actor:give_game_news("Zone Speed Demons Archive (ZSDA) - Splits", msg, "ui_icons_boar25", 0, 7500, 0)
+    end
+end
+
+function notify_time(which, time, pb)
+	msg = clr_y .. ""
+	
+	if which == "ll" then
+		msg = msg .. "Living Legend "
+	elseif which == "ms" then
+		msg = msg .. "Mortal Sin "
+	elseif which == "oa" then
+		msg = msg .. "Operation Afterglow "
+	end
+	
+	msg = msg .. clr_w .. "completed at: [" .. into_clock(time) .. "]."
+	if pb == 1 then
+		msg = msg .. "\\n" .. clr_g .. "NEW PERSONAL BEST!"
+	end
+	
+	if db.actor then
+		db.actor:give_game_news("Zone Speed Demons Archive (ZSDA)", msg, "ui_icons_boar25", 0, 5000, 0)
+    end
+end
+
+
+function game_achievements.wishful_thinking_rewards()
+	ll_old()
+	time = get_actual_time()
+	best = splits:r_value("times", "ll_best", 2) 
+	if (best == 0) or ((time < best) and (best > 0)) then
+		splits:w_value("times", "ll_best", time)
+		notify_time("ll", time, 1)
+	else
+		notify_time("ll", time, 0)
+	end
+	splits:w_value("times", "ll_last", time)
+	splits:save()
+end
+
+function game_achievements.absolver_rewards()
+	ms_old()
+	time = get_actual_time()
+	best = splits:r_value("times", "ms_best", 2) 
+	if (best == 0) or ((time < best) and (best > 0)) then
+		splits:w_value("times", "ms_best", time)
+		notify_time("ms", time, 1)
+	else
+		notify_time("ms", time, 0)
+	end
+	splits:w_value("times", "ms_last", time)
+	splits:save()
+end
+
+function game_achievements.collaborator_rewards()
+	oa_old()
+	--printf("abcabc")
+	time = get_actual_time()
+	best = splits:r_value("times", "oa_best", 2) 
+	if (best == 0) or ((time < best) and (best > 0)) then
+		splits:w_value("times", "oa_best", time)
+		notify_time("oa", time, 1)
+	else
+		notify_time("oa", time, 0)
+	end
+	splits:w_value("times", "oa_last", time)
+	splits:save()
+end
+
+
+-- Yes, this DOES mean that you can make oldschool styled cheatcodes.
+-- Try adding UZUMYMW
+
+local passwords =
+{
+	["show_time"] =		"31_25_18_18_32_19_22_49", 				-- S P E E D R U N
+}
+
+local char_cache = ""
+local char_timer = 0
+
+local function on_key_press(key)
+	char_cache = char_cache .. tostring(key) .. "_"
+	char_timer = time_global()
+	for k,v in pairs(passwords) do
+		if string.find(char_cache,v) then
+			char_cache = ""
+			
+			if v == passwords["show_time"] then
+				show_times()
+			end
+		end
+	end
+end
+
+local function actor_on_update()
+	if time_global() - char_timer > 500 then
+		char_cache = ""
+		char_timer = 0
+	end
+end
+
+
+
+function on_game_start()
+    RegisterScriptCallback("on_key_press", on_key_press)
+	RegisterScriptCallback("actor_on_update", actor_on_update)
+end

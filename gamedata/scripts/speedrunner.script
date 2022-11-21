@@ -1,0 +1,117 @@
+function to_dd(n)
+	if n < 10 then
+		return "0" .. math.floor(n)
+	end
+	return math.floor(n)
+end
+
+function time_split(time)
+	s_ = 0
+	m_ = 0
+	h_ = 0
+	d_ = 1
+	
+	while (time > 86399) do
+		d_ = d_ + 1
+		time = time - 86400
+	end
+	
+	while (time > 3599) do
+		h_ = h_ + 1
+		time = time - 3600
+	end
+	
+	while (time > 59) do
+		m_ = m_ + 1
+		time = time - 60
+	end
+	
+	s_ = time
+	
+	if d_ == 0 then
+		if h_ == 0 then
+			return string.format("%s:%s", to_dd(m_), to_dd(s_))
+		end
+		return string.format("%s:%s:%s", to_dd(h_), to_dd(m_), to_dd(s_))
+	end
+	return string.format("DAY %s - %s:%s:%s", d_, to_dd(h_), to_dd(m_), to_dd(s_))
+end
+
+function get_detailed_time()
+	local s_time = level.get_start_time() or 0
+	local time = tonumber(game.get_game_time():diffSec(s_time))
+	
+	time = time_split(math.ceil(time))
+	
+	return time
+end
+
+function pda.get_stat(index)
+	if(index==0) then
+		return get_detailed_time()
+	elseif(index==1) then
+		return tostring(game_statistics.get_statistic_count("emissions"))
+	elseif(index==2) then
+		return tostring(game_statistics.get_statistic_count("tasks_completed"))
+	elseif(index==3) then
+		return tostring(game_statistics.get_statistic_count("killed_monsters"))
+	elseif(index==4) then
+		return tostring(game_statistics.get_statistic_count("killed_stalkers"))
+	elseif(index==5) then
+		return tostring(game_statistics.get_statistic_count("boxes_smashed"))
+	elseif(index==6) then
+		return tostring(game_statistics.get_statistic_count("stashes_found"))
+	elseif(index==7) then
+		return tostring(game_statistics.get_statistic_count("psi_storms"))
+	elseif(index==8) then
+		return tostring(game_statistics.get_statistic_count("pdas_delivered"))
+	elseif(index==9) then
+		return tostring(game_statistics.get_statistic_count("helicopters_downed"))
+	elseif(index==10) then
+		return tostring(game_statistics.get_statistic_count("artefacts_detected"))
+	elseif(index==11) then
+		return tostring(game_statistics.get_statistic_count("wounded_helped"))
+	elseif(index==12) then 
+		return tostring(game_statistics.get_statistic_count("level_changes"))
+	elseif(index==13) then 
+		return tostring(game_statistics.get_statistic_count("enemies_surrendered"))
+	elseif(index==14) then 
+		return tostring(game_statistics.get_statistic_count("field_dressings"))
+	elseif(index==15) then 
+		return (ui_pda_encyclopedia_tab.get_articles_unlocked_count() .. "/" .. ui_pda_encyclopedia_tab.get_articles_count())
+	elseif(index==16) then 
+		return (game_achievements.get_achievements_unlocked_count() .. "/" .. game_achievements.get_achievements_count())
+	elseif(index==17) then 
+		return (game_statistics.get_actor_visited_levels_count() .. "/33")
+	elseif(index==18) then 
+		return (db.actor:money() .. " RU")
+	end
+	return ""
+end
+
+function time_split_2(time)
+	s_ = 0
+	m_ = 0
+	h_ = 0
+	d_ = 0
+	
+	while (time > 86399) do
+		d_ = d_ + 1
+		time = time - 86400
+	end
+	
+	while (time > 3599) do
+		h_ = h_ + 1
+		time = time - 3600
+	end
+	
+	while (time > 59) do
+		m_ = m_ + 1
+		time = time - 60
+	end
+	
+	s_ = time
+	
+	return string.format("%s:%s:%s:%s", to_dd(d_), to_dd(h_), to_dd(m_), to_dd(s_))
+end
+
